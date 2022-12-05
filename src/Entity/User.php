@@ -29,6 +29,9 @@ class User
     #[ORM\Column]
     private ?bool $manager = null;
 
+    #[ORM\OneToOne(mappedBy: 'user_id', cascade: ['persist', 'remove'])]
+    private ?Score $score = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -90,6 +93,23 @@ class User
     public function setManager(bool $manager): self
     {
         $this->manager = $manager;
+
+        return $this;
+    }
+
+    public function getScore(): ?Score
+    {
+        return $this->score;
+    }
+
+    public function setScore(Score $score): self
+    {
+        // set the owning side of the relation if necessary
+        if ($score->getUserId() !== $this) {
+            $score->setUserId($this);
+        }
+
+        $this->score = $score;
 
         return $this;
     }
