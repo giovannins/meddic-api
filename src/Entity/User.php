@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -31,6 +33,14 @@ class User
 
     #[ORM\OneToOne(mappedBy: 'user_id', cascade: ['persist', 'remove'])]
     private ?Score $score = null;
+
+    #[ORM\OneToMany(mappedBy: 'user_id', targetEntity: Customer::class, orphanRemoval: true)]
+    private Collection $customers;
+
+    public function __construct()
+    {
+        $this->customers = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -110,6 +120,36 @@ class User
         }
 
         $this->score = $score;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Customer>
+     */
+    public function getCustomers(): Collection
+    {
+        return $this->customers;
+    }
+
+    public function addCustomer(Customer $customer): self
+    {
+        if (!$this->customers->contains($customer)) {
+            $this->customers->add($customer);
+            $customer->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCustomer(Customer $customer): self
+    {
+        if ($this->customers->removeElement($customer)) {
+            // set the owning side to null (unless already changed)
+            if ($customer->getUserId() === $this) {
+                $customer->setUserId(null);
+            }
+        }
 
         return $this;
     }
