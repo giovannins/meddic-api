@@ -26,7 +26,7 @@ class UsersController extends AbstractController
 
         $data = $userRepository->findAll();
 
-        return $this->json(['data' => $data]);
+        return $this->json($data);
     }
 
     #[Route('/users/{id}', name: 'users_id', methods: ['GET'])]

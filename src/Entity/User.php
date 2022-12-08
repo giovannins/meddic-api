@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-class User
+class User // implements \JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -153,4 +153,11 @@ class User
 
         return $this;
     }
+
+    // public function jsonSerialize()
+    // {
+    //     return [
+    //         "id" => $this->getId()
+    //     ];
+    // }
 }
