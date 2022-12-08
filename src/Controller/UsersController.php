@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Score;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -23,7 +24,9 @@ class UsersController extends AbstractController
             throw new ErrorException("Your key is not valid");
         }
 
-        return $this->json($userRepository->findAll());
+        $data = $userRepository->findAll();
+
+        return $this->json(['data' => $data]);
     }
 
     #[Route('/users/{id}', name: 'users_id', methods: ['GET'])]
@@ -52,6 +55,7 @@ class UsersController extends AbstractController
         return $this->json($userRepository->findOneBy(['name' => $name]));
     }
 
+    #[Route('/users', name: 'users_name_add', methods: ['POST'])]
     public function addUser(Request $request, ManagerRegistry $managerRegistry): JsonResponse
     {
         $body = $request->toArray();
@@ -67,8 +71,10 @@ class UsersController extends AbstractController
         $user->setEmail($body['email']);
         $user->setKey('key');
         $user->setPassword(password_hash($body['password'], PASSWORD_BCRYPT));
-        $user->setManager(false);
+        $user->setManager($body['manager']);
         
+        $manager->persist($user);
+        $manager->flush();
 
         return $this->json($user->getId());
     }
